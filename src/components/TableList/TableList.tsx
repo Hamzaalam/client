@@ -17,7 +17,8 @@ import formatDate from '../../utils/formatDate';
 import Box from '@mui/material/Box';
 import { TextField, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add'
-import { updateList } from '../../utils/axios';
+import { updateList, DeleteList } from '../../utils/axios';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -88,7 +89,7 @@ const updateStatusOfProduct = async (listId:string, productId:number, status:boo
    const localList = list || [];
     localList?.forEach(a => {
       if(a._id == listId){
-          a.products.map((p:Product) => {
+         a.products.map((p:Product) => {
               if(p.id == productId){
                 p.status = !status;
               }
@@ -100,6 +101,12 @@ const updateStatusOfProduct = async (listId:string, productId:number, status:boo
     await updateList({products:updatedProducts}, listId);
 }
 
+  const handleDeleteList = async (listId:string) => {
+    const localList = list && list.filter((item) => item._id !== listId) || [];
+    setList(localList);
+    await DeleteList(listId);
+  }
+
   return (
         <React.Fragment>
           {list && list.map(a => 
@@ -109,10 +116,13 @@ const updateStatusOfProduct = async (listId:string, productId:number, status:boo
                   aria-controls="panel1a-content"
                   id="panel1a-header"
                 >
-                  <Box sx={{width:[250,400,null, 600] , display:'flex', justifyContent:'space-between'}}>
+                  <Box sx={{width:[250,400,null, 600] , display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                     <Typography >{a.name}</Typography>
                     <Typography >{formatDate(new Date(a.created_at))}</Typography>
                   </Box>
+                  <IconButton onClick={()=>handleDeleteList(a._id)}>
+                    <DeleteIcon /> 
+                  </IconButton>
                 </AccordionSummary>
                 <AccordionDetails>
                 <TableContainer>
@@ -134,7 +144,7 @@ const updateStatusOfProduct = async (listId:string, productId:number, status:boo
                                 {row.quantity}
                               </StyledTableCell>
                               <StyledTableCell align="left" >
-                                <Checkbox size="small" checked={row.status} value={row.status} onChange={() => updateStatusOfProduct(a._id,row.id, row.status)} />
+                                <Checkbox size="small" defaultChecked={row.status} value={row.status} onChange={() => updateStatusOfProduct(a._id,row.id, row.status)} />
                               </StyledTableCell>
                             </StyledTableRow>
                         ))}

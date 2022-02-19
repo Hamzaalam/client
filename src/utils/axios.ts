@@ -32,6 +32,16 @@ export  const updateList  = async (req:any, listId:string)  => {
   }
 }
 
+export  const DeleteList  = async (listId:string)  => {  
+  try {
+    const response = await axios.delete(`/list/${listId}`);
+    return response.data;
+  } 
+  catch (error) {
+    console.log(error)
+  }
+}
+
 
 
 
